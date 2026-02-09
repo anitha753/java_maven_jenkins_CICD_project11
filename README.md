@@ -30,7 +30,7 @@ cat /var/lib/jenkins/secrets/initialAdminPassword
    java --version   (java 21)
    
 
-5) Install Tomcat [ IN EC2 ]   
+5) Install Tomcat [ IN EC2 ]   (which supports java17 and 21)
 cd /opt
   wget https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.18/bin/apache-tomcat-11.0.18.tar.gz
   tar -zxvf apache-tomcat-11.0.18.tar.gz
