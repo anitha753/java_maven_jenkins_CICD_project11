@@ -5,7 +5,7 @@ github repo: https://github.com/anitha753/java_maven_jenkins_CICD_project11.git
 git commands:
    git remote add origin https://github.com/anitha753/java_maven_jenkins_CICD_project11.git
    git branch
-   git branch -M main   (to cahnge master branch to main in local repo)
+   git branch -M main   (to change master branch to main in local repo)
    git branch
    git push -u origin main
    git log
