@@ -46,5 +46,71 @@ cd tomcat/
   cd bin/
      sh shutdown.sh
      sh startup.sh
+====================================================================
+6)Install sonarqube [IN EC2] which supports java17
+
+[root@sonar~]# cat sonar.sh
+#! /bin/bash
+cd /opt/
+wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.9.6.50800.zip
+unzip sonarqube-8.9.6.50800.zip
+sudo yum install java-17-amazon-corretto -y
+sudo update-alternatives --config java
+mv sonarqube-8.9.6.50800 sonarqube
+useradd sonar
+chown -R sonar:sonar sonarqube
+chmod 777 sonarqube
+su - sonar
+
+# use the below command manually after installation
+#sh /opt/sonarqube-8.9.6.50800/bin/linux-x86-64/sonar.sh start
+#echo "user=admin & password=admin"
+[root@sonar~]#
+
+============OR======
+Create service for Sonarqube
+
+sudo vim /etc/systemd/system/sonar.service
+
+Paste the below into the file
+
+[Unit]
+Description=SonarQube service
+After=syslog.target network.target
+
+[Service]
+Type=forking
+
+ExecStart=/opt/sonarqube/bin/linux-x86-64/sonar.sh start
+ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop
+
+User=sonar
+Group=sonar
+Restart=always
+
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target
+Start Sonarqube and Enable service
+
+sudo systemctl start sonar
+sudo systemctl enable sonar
+sudo systemctl status sonar
+sudo tail -f /opt/sonarqube/logs/sonar.log
+
+========================================================================================
+
+
+
+
+
+
+
+
+
+
+
    77  sh startup.sh
    78  history
