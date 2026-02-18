@@ -279,6 +279,32 @@ vim tomcat.yml
          enabled: yes
  ...
 
+ ansible-playbook tomcat.yml --syntax-check
+ ansible-playbook tomcat.yml --check
+ ansible-playbook tomcat.yml
+++++++++++++++
+After tomcatsetup 
+in browser publicip:8080 (port must be added in inbound rules)
+username: tomcat  password: 123456
+tomcat server setup successful
++++++++++++++++++
+In master install GIT AND MAVEN
+yum install git maven -y
+
+ ++++++++++++++++++++
+vim deployment.yaml
+---
+- hosts: dev
+  connection: ssh
+
+  tasks:
+  - name: copying war file to tomcat server
+    copy:
+      src: /var/lib/jenkins/workspace/job1/target/myapp.war
+      dest: /root/tomcat/webapps/
+
+:wq  
+++++++++++++++++++++++++++
 
 
 
@@ -290,5 +316,5 @@ vim tomcat.yml
 
 
 
-   77  sh startup.sh
-   78  history
+
+   
