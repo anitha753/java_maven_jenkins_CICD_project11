@@ -1,4 +1,5 @@
 CLICK ON RAW MODE TO SEE PROPER STEPS
+---------------------------------------
 1) Install Git [ IN EC2 ]
 yum install git -y 
 git --version
