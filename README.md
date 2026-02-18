@@ -103,6 +103,182 @@ sudo tail -f /opt/sonarqube/logs/sonar.log
 ========================================================================================
 
 
+7)) install ansible and deploy an application on to tomcat server using ansible playbooks
+
+3- servers  master slave1 slave2
+same setup:
+amazon-linux-2023 kernel, t2.micro, a keypair, 8GB storage
+
+IN 3 SERVERS SAME SETUP
+----------------------
+sudo -i
+useradd ansible
+passwd ansible
+12345678
+12345678
+
+visudo
+   root    ALL=(ALL)       ALL
+   ansible    ALL=(ALL)       NOPASSWD: ALL
+ctrl+X ctrl+Y and Enter button to save and exit
+
+vi /etc/ssh/sshd_config
+PermitRootLogin yes     ----->38 line
+PasswordAuthentication yes   ------->63 line
+PermitEmptyPasswords no
+:wq
+systemctl start sshd
+su - ansible
+
+ONLY IN MASTER WHICH IS ANSIBLE SERVER
+----------------------------------------
+su - ansible
+yum install python3 python3-pip python-devel openssl -y
+pip3 install ansible --user
+ansible --version
+
+mkdir -p /etc/ansible
+vi /etc/ansible/hosts
+  [dev]
+  private ip of slave1
+  [test]
+  private ip of slave2
+:wq
+
+ssh-keygen
+ssh-copy-id ansible@privateip of slave
+ssh ansible@privateip of slave
+login successful
+logout to comeout of the slave
+
+ansible all --list-hosts
+   displays conncted slaves
+ansible dev -m ping 
+   configured correctly or not ping-pong successful
+
+SAME CONFIGURATION WITH ROOT USER WITHOUT ANSIBLE USER
+--------------------------------------------------------
+IN 3 SERVERS SAME SETUP
+----------------------
+sudo -i
+passwd root
+12345678
+12345678
+
+no need of this step
+  |visudo
+  |   root    ALL=(ALL)       ALL  
+  |   ansible    ALL=(ALL)       NOPASSWD: ALL
+  |ctrl+X ctrl+Y and Enter button to save and exit
+
+vi /etc/ssh/sshd_config
+#PermitRootLogin yes     ----->NO NEED
+PasswordAuthentication yes   ------->63 line
+PermitEmptyPasswords no
+:wq
+systemctl start sshd
+su - ansible
+
+ONLY IN MASTER WHICH IS ANSIBLE SERVER  
+----------------------------------------
+execute all below with in the ROOT USER ONLY 
+
+su - i      
+yum install python3 python3-pip python-devel openssl -y
+pip3 install ansible --user
+ansible --version
+
+mkdir -p /etc/ansible
+vi /etc/ansible/hosts
+  [dev]
+  private ip of slave1
+  [test]
+  private ip of slave2
+:wq
+
+ssh-keygen
+ssh-copy-id root@privateip of slave
+ssh root@privateip of slave
+login successful
+logout to comeout of the slave
+
+ansible all --list-hosts
+   displays conncted slaves
+ansible dev -m ping 
+   configured correctly or not ping-pong successful
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++
+install jenkins on master
+install and configure tomcat on slave server using yaml file on master
+
+vim tomcat.yml
+
+---
+- hosts: dev
+  connection: ssh
+
+  tasks:
+    - name: install java
+      ansible.builtin.dnf:
+        name: java-17-amazon-corretto
+        state: present
+
+    - name: retrieve tar file from link
+      ansible.builtin.get_url:
+           url: https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.18/bin/apache-tomcat-11.0.18.tar.gz
+           dest: "/root/"
+
+    - name: untar the file
+      command: tar -zxvf /root/apache-tomcat-11.0.18.tar.gz -C /root/
+
+    - name: rename the tomcat file
+      command: mv /root/apache-tomcat-11.0.18/ /root/tomcat
+
+    - name: set roles in tomcat servers
+      template:
+        src: tomcat-users.xml
+        dest: /root/tomcat/conf/tomcat-users.xml
+
+    - name: modify context.xml to allow access
+      template:
+        src: context.xml
+        dest: /root/tomcat/webapps/manager/META-INF/context.xml
+    - name: create tomcat systemd service file
+      copy:
+        dest: /etc/systemd/system/tomcat.service
+        content: |
+          [Unit]
+          Description=Apache Tomcat server
+          After=network.target
+
+          [Service]
+          Type=forking
+          User=root
+          Group=root
+
+          Environment="JAVA_HOME=/usr/lib/jvm/jre"
+          Environment="CATALINA_HOME=/root/tomcat"
+          ExecStart=/root/tomcat/bin/startup.sh
+          ExecStop=/root/tomcat/bin/shutdown.sh
+          Restart=on-failure
+
+          [Install]
+          WantedBy=multi-user.target
+
+    -  name: reload system daemon
+       systemd:
+         daemon_reload: yes
+
+    -  name: start and enable tomcat service
+       ansible.builtin.service:
+         name: tomcat
+         state: started
+         enabled: yes
+ ...
+
+
+
 
 
 
