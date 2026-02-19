@@ -357,15 +357,30 @@ ansible -m setup -a "filter=ansible_devices" dev
 ansible dev -a "ls /home"
 ansible dev -a "ls /root/"
 ansible dev -b -m copy -a "src=one.yml dest=/root/"
-ansible dev -b -m yum -a "name=httpd state=present"
-ansible dev -b -m service -a "name=httpd state=started"
 ansible dev -b -m user -a "name=vinu state=present"
+
+ansible dev -b -m yum -a "name=httpd state=present"
+ansible dev -b -m service -a "name=httpd state=started"  
 ansible dev -a "systemctl status httpd"
      |httpd.service - The Apache HTTP Server
      |Loaded: loaded (/usr/lib/systemd/system/httpd.service; disabled; preset: disabled)
      |Active: active (running) since Thu 2026-02-19 05:51:20 UTC; 1min 54s ago
 
+vim index.html
+<html>
+   <head>
+      <title>MYAPP</title>
+   </head>
+   <body bgcolor="pink">
+      <marquee>WELCOME TO LINUX WORLD</marquee>
+   </body>
+</html>
 
+ansible dev -b -m copy -a "src=index.html dest=/var/www/html/"
+In Browser paste dev server public ip
+you have successfully deployed your static app on httpd webserver.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 
