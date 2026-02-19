@@ -235,7 +235,7 @@ vim jenkins.yml
     - name: import jenkins gpg key
       ansible.builtin.rpm_key:
         state: present
-        key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+        key: https://pkg.jenkins.io/rpm-stable/jenkins.io-2023.key
     - name: install jenkins
       ansible.builtin.dnf:
         name: jenkins
@@ -261,7 +261,33 @@ vim jenkins.yml
           var: output.stdout
 ...
 ansible-playbook jenkins.yml
-++++++++++++++++++++++++++++++++++++++++++++++++++++
+OUTPUT:
+information.
+ok: [172.31.28.230]
+TASK [ensure system packages are updated] *******************************
+ok: [172.31.28.230]
+TASK [install java] *****************************************************
+changed: [172.31.28.230]
+TASK [add jenkins repo] ************************************************
+changed: [172.31.28.230]
+TASK [import jenkins gpg key] *********************************************
+changed: [172.31.28.230]
+TASK [install jenkins] ***********************************************
+changed: [172.31.28.230]
+TASK [start and enable jenkins service] **********************************
+changed: [172.31.28.230]
+TASK [wait for jenkins to startup] ***********************************
+ok: [172.31.28.230]
+TASK [retrieve initial admin password] *********************
+ok: [172.31.28.230]
+TASK [display initial admin password] ***************
+ok: [172.31.28.230] => {
+    "output.stdout": "8148a9bba14641e3b6113976dbfb692f"
+}
+PLAY RECAP **********************
+172.31.28.230              : ok=10   changed=5    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 install and configure tomcat on slave server using yaml file on master
 
