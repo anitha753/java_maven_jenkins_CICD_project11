@@ -306,8 +306,50 @@ vim deployment.yaml
 :wq  
 ++++++++++++++++++++++++++
 
+IMPORTANT PLAYBOOKS
+======================================
 
+---
+- hosts: dev
+  connection: ssh
 
+  tasks:
+    - name: total memory of slave
+      debug:
+        msg: "ansible slave server memory is {{ansible_memory_mb.real}}"
+
+    - name: slave server operating system
+      debug:
+        msg: "os family for slave {{ansible_fqdn}} is {{ansible_os_family}} and kernel is {{ansible_kernel}}"
+    - name: get users from slave
+      command: cat /etc/passwd
+      register: output
+    - name: users list of slve server
+      debug:
+        msg: "users in slave servers are {{output.stdout}}"
+...
+
+ansible-playbook one.yml
+OUTPUT:
+ok: [172.31.28.230]
+TASK [total memory of slave] *****************************************************************************************************************************************
+ok: [172.31.28.230] => {
+    "msg": "ansible slave server memory is {'total': 961, 'used': 378, 'free': 583}"
+}
+TASK [slave server operating system] *********************************************************************************************************************************
+ok: [172.31.28.230] => {
+    "msg": "os family for slave ip-172-31-28-230.ec2.internal is RedHat and kernel is 6.1.161-183.298.amzn2023.x86_64"
+}
+TASK [get users from slave] ******************************************************************************************************************************************
+changed: [172.31.28.230]
+TASK [users list of slve server] *************************************************************************************************************************************
+ok: [172.31.28.230] => {
+    "msg": "users in slave servers are root:x:0:0:root:/root:/bin/bash\nbin:x:1:1:bin:/bin:/sbin/nologin\ndaemon:x:2:2:daemon:/sbin:/sbin/nologin\nadm:x:3:4:adm:/var/adm:/sbin/nologin\nlp:x:4:7:lp:/var/spool/lpd:/sbin/nologin\nsync:x:5:0:sync:/sbin:/bin/sync\nshutdown:x:6:0::FTP unprivileged user:/var/lib/stapunpriv:/sbin/nologin\nrpcuser:x:29:29:RPC Service User:/var/lib/nfs:/sbin/nologin\ntcpdump:x:72:72::/:/sbin/nologin\nec2-user:x:1000:1000:EC2 Default User:/home/ec2-user:/bin/bash"
+}
+PLAY RECAP ***********************************************************************************************************************************************************
+172.31.28.230              : ok=5    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+========================
 
 
 
