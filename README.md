@@ -368,6 +368,40 @@ tomcat server setup successful
 In master install GIT AND MAVEN
 yum install git maven -y
 
+pipeline {
+    agent any
+    stages {
+        stage('checkout-code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/anitha753/java_maven_jenkins_CICD_project11.git'
+            }
+        }
+        stage('test-code') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('compile-code') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('generate-package') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('deploy-code') {
+            steps {
+                echo 'Thorugh Ansible Playbook deployment.yml'
+            }
+        }
+    }
+}
+OUTPUT:
+[INFO] Building war: /var/lib/jenkins/workspace/job1/target/myapp.war
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
  ++++++++++++++++++++
 vim deployment.yaml
 ---
@@ -381,7 +415,7 @@ vim deployment.yaml
       dest: /root/tomcat/webapps/
 
 :wq  
-++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 IMPORTANT PLAYBOOKS
 ======================================
