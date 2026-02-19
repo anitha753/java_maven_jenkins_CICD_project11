@@ -102,6 +102,77 @@ sudo systemctl enable sonar
 sudo systemctl status sonar
 sudo tail -f /opt/sonarqube/logs/sonar.log
 
+============
+Pipeline code to execute the above project
+
+pipeline {
+    agent any
+    stages {
+        stage('checkout-code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/anitha753/java_maven_jenkins_CICD_project11.git'
+            }
+        }
+        stage('compile-code') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test-code') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('SONARQUBE-SCANNING') {
+            steps {
+                withSonarQubeEnv('SonarQube'){
+                     sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar'
+                }
+            }
+        }
+        stage('generate-artifactory') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('upload-artifactory-nexus') {
+            steps {
+                //generate pipeline script for nexusArtifactUploader artifacts: .....
+                //paste it here
+                echo 'uploaded to nexus repo'
+            }
+        }
+        stage('deploy-code-tomcat') {
+            steps {
+                //generate pipeline script for deploy adapters: [tomcat9(alternativeDeploymentContext:.....
+                //paste it here
+                //OR
+                 echo 'Thorugh Ansible Playbook deployment.yml'
+                //Thorugh Ansible Playbook deployment.yml  
+            }
+        }
+    }
+}
+---------------------------------------------
+stage('SonarQube Analysis') {
+            steps {
+                // Wrap the analysis command with the withSonarQubeEnv step
+                withSonarQubeEnv(installationName: 'SonarQube') { // 'SonarQube' is the name configured in 'Configure System'
+                    // The actual analysis command (e.g., for Maven)
+                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar'
+                    // If using the CLI, the command is simply:
+                    // sh 'sonar-scanner'
+                }
+            }
+        }
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 10, unit: 'MINUTES') { // Wait up to 10 minutes for the quality gate result
+                    // Pause the pipeline until the SonarQube analysis is complete and fetch the status
+                    waitForQualityGate abortPipeline: true // 'abortPipeline: true' fails the build if the quality gate fails
+                }
+            }
+        }
 ========================================================================================
 
 
