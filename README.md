@@ -249,7 +249,7 @@ vim jenkins.yml
     - name: wait for jenkins to startup
       ansible.builtin.wait_for:
         port: 8080
-        host: {{inventory_hostname}}
+        host: "{{inventory_hostname}}"   ------------------> " " important otherwise while execution it will throw ERROR 
         delay: 10
         timeout: 60
     - name: retrieve initial admin password
