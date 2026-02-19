@@ -212,6 +212,57 @@ ansible dev -m ping
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++
 install jenkins on master
+vim jenkins.yml
+---
+- hosts: localhost
+  connection: ssh
+
+  tasks:
+    - name: ensure system packages are updated
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+        disable_gpg_check: false
+    - name: install java
+      ansible.builtin.dnf:
+        name: java-21-amazon-corretto
+        state: present
+    - name: add jenkins repo
+      ansible.builtin.get_url:
+        url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+        mode: '0644'
+    - name: import jenkins gpg key
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+    - name: install jenkins
+      ansible.builtin.dnf:
+        name: jenkins
+        state: present
+     - name: start and enable jenkins service
+      ansible.builtin.systemd_service:
+        name: jenkins
+        state: started
+        enabled: true
+        daemon_reload: true
+    - name: wait for jenkins to startup
+      ansible.builtin.wait_for:
+        port: 8080
+        host: {{inventory_hostname}}
+        delay: 10
+        timeout: 60
+    - name: retrieve initial admin password
+      ansible.builtin.shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+      register: output
+      changed_when: false
+    - name: display initial admin password
+      ansible.builtin.debug:
+          var: output.stdout
+...
+ansible-playbook jenkins.yml
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 install and configure tomcat on slave server using yaml file on master
 
 vim tomcat.yml
