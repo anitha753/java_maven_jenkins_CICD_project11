@@ -350,7 +350,20 @@ PLAY RECAP *********************************************************************
 172.31.28.230              : ok=5    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ========================
-
+<<<install=present  uninstall=absent  update=latest restart=started>>>
+SOME IMPORTANT COMMANDS ((HERE DEV MEANS HOSTS OF INVENTORY FILE))
+ansible -m setup -a "filter=ansible_os_family" dev
+ansible -m setup -a "filter=ansible_devices" dev
+ansible dev -a "ls /home"
+ansible dev -a "ls /root/"
+ansible dev -b -m copy -a "src=one.yml dest=/root/"
+ansible dev -b -m yum -a "name=httpd state=present"
+ansible dev -b -m service -a "name=httpd state=started"
+ansible dev -b -m user -a "name=vinu state=present"
+ansible dev -a "systemctl status httpd"
+     |httpd.service - The Apache HTTP Server
+     |Loaded: loaded (/usr/lib/systemd/system/httpd.service; disabled; preset: disabled)
+     |Active: active (running) since Thu 2026-02-19 05:51:20 UTC; 1min 54s ago
 
 
 
